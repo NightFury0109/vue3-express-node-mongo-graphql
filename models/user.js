@@ -17,14 +17,12 @@ const userSchema = new Schema({
   },
   status: {
     type: String,
-    default: 'I am New!'
+    default: 'Active'
   },
-  posts: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Post'
-    }
-  ]
+  role: {
+    type: String,
+    default: 'User'
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);

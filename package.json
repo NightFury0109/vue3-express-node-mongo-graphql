@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "preserver": "start mongod --dbpath ./database"
+    "preserver": "start mongod --dbpath ./database",
+    "client": "npm run serve --prefix ./client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "Night Fury",
   "license": "MIT",
@@ -23,6 +25,7 @@
     "validator": "^13.7.0"
   },
   "devDependencies": {
+    "concurrently": "^6.4.0",
     "nodemon": "^2.0.15"
   }
 }
