@@ -1,33 +1,49 @@
 <template>
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">GraphQL</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarCollapse"
-        aria-controls="navbarCollapse"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarCollapse">
-        <ul class="navbar-nav mb-2 mb-md-0">
+      <router-link class="navbar-brand" to="/">GraphQL</router-link>
+      <div class="text-right">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarCollapse"
+          aria-controls="navbarCollapse"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mb-2 mb-md-0">
+            <li class="nav-item">
+              <router-link class="nav-link active" aria-current="page" to="/"
+                >Home</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/login">Login</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/register">Register</router-link>
+            </li>
+          </ul>
+          <!-- <ul class="navbar-nav mb-2 mb-md-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
-          </li>
-        </ul>
-        <ul class="navbar-nav mb-2 mb-md-0">
-          <li class="nav-item">
-            <a class="nav-link" href="#">Login</a>
+            <router-link class="nav-link" to="/login">Login</router-link>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Register</a>
+            <router-link class="nav-link" to="/register">Register</router-link>
           </li>
-        </ul>
+        </ul> -->
+        </div>
       </div>
     </div>
   </nav>
 </template>
+
+<style>
+.navbar {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3), 0 6px 12px 0 rgba(0, 0, 0, 0.5);
+}
+</style>

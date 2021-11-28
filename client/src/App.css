@@ -1,3 +1,10 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  margin: 0!important;
+  font-family: sans-serif;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }
