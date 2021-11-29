@@ -2,7 +2,7 @@
   <div class="d-flex justify-content-center">
     <main class="box">
       <h2>Login</h2>
-      <form novalidate>
+      <form @submit.prevent="userLogin" novalidate>
         <div class="inputBox">
           <label for="email">Email</label>
           <input
@@ -10,7 +10,7 @@
             name="email"
             id="email"
             placeholder="type your email"
-            required
+            v-model="userData.email"
           />
         </div>
         <div class="inputBox">
@@ -20,7 +20,7 @@
             name="userPassword"
             id="userPassword"
             placeholder="type your password"
-            required
+            v-model="userData.password"
           />
         </div>
         <div>
@@ -36,8 +36,23 @@
 </template>
 
 <script>
+import {mapActions} from 'vuex';
 export default {
-  name: "Login"
+  name: "Login",
+  data(){
+    return{
+      userData:{
+        email:'',
+        password:''
+      }
+    }
+  },
+  methods: {
+    ...mapActions('user',['login']),
+    userLogin(){
+      this.login(this.userData);
+    }
+  }
 };
 </script>
 

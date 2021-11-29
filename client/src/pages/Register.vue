@@ -2,15 +2,15 @@
   <div class="d-flex justify-content-center align-content-center">
     <main class="box">
       <h2>Register</h2>
-      <form novalidate>
+      <form @submit.prevent="handleSubmit" novalidate>
         <div class="inputBox">
-          <label for="userName">Username</label>
+          <label for="username">User's name</label>
           <input
             type="text"
-            name="userName"
-            id="userName"
+            name="username"
+            id="username"
             placeholder="type your username"
-            required
+            v-model="userData.name"
           />
         </div>
         <div class="inputBox">
@@ -20,7 +20,7 @@
             name="email"
             id="email"
             placeholder="type your email"
-            required
+            v-model="userData.email"
           />
         </div>
         <div class="inputBox">
@@ -30,7 +30,7 @@
             name="userPassword"
             id="userPassword"
             placeholder="type your password"
-            required
+            v-model="userData.password"
           />
         </div>
         <div class="inputBox">
@@ -40,13 +40,11 @@
             name="userPassword"
             id="userConfirmPassword"
             placeholder="confirm your password"
-            required
+            v-model="userData.password2"
           />
         </div>
         <button type="submit" name="" style="float: left">Register</button>
-        <router-link class="button" style="float: left" to="/login"
-          >Login</router-link
-        >
+        <router-link class="button" style="float: left" to="/login">Login</router-link>
       </form>
     </main>
     <footer></footer>
@@ -54,8 +52,31 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
   name: "Register",
+  data() {
+    return {
+      userData: {
+        name: "",
+        email: "",
+        password: "",
+        password2: "",
+      },
+    };
+  },
+  
+  methods: {
+    ...mapActions("user", ["register"]),
+    handleSubmit() {
+      if(this.userData.password===this.userData.password2){
+        this.register(this.userData);
+      }else{
+        console.log('dismatch')
+      }
+    },
+  },
 };
 </script>
 

@@ -52,8 +52,8 @@ module.exports = {
     if (validator.isEmpty(userInput.email) || !validator.isEmail(userInput.email)) {
       errors.push('Invalid Email');
     }
-    if (validator.isEmpty(userInput.password) || !validator.isLength(userInput.password, { min: 8 })) {
-      errors.push('Password should be atleast 8 characters long');
+    if (validator.isEmpty(userInput.password) || !validator.isLength(userInput.password, { min: 6 })) {
+      errors.push('Password should be atleast 6 characters long');
     }
     if (errors.length > 0) {
       const error = new Error('Validation failed');
@@ -89,8 +89,8 @@ module.exports = {
     if (!validator.isEmail(loginInput.email)) {
       errors.push('Invalid email');
     }
-    if (validator.isEmpty(loginInput.password) && !validator.isLength(loginInput.password, { min: 8 })) {
-      errors.push('Password should be atleast 8 characters long');
+    if (validator.isEmpty(loginInput.password) && !validator.isLength(loginInput.password, { min: 6 })) {
+      errors.push('Password should be atleast 6 characters long');
     }
     if (errors.length > 0) {
       const error = new Error('Validation failed');
