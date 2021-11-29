@@ -119,7 +119,7 @@ module.exports = {
       { expiresIn: 14400 }
     );
     return {
-      token: token,
+      token: 'Bearer ' + token,
       userId: user._id.toString()
     }
   },
@@ -144,18 +144,28 @@ module.exports = {
     }
 
     const user = await User.findById(req.userId);
+
     checkUser(user);
+
+    let tags;
+
+    if (typeof postInput.tags !== 'undefined') {
+      tags = postInput.tags.split(',');
+    }
 
     const post = new Post({
       title: postInput.title,
       content: postInput.content,
+      tags: tags,
       imageUrl: postInput.imageUrl,
+      alterText: postInput.alterText,
       creator: user._id
     });
 
     const createdPost = await post.save();
 
     user.posts.push(post);
+
     const updatedUser = await user.save();
 
     return {

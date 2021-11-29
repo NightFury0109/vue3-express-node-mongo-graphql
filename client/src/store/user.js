@@ -1,7 +1,9 @@
 // import { userService } from '../services/userService';
 import router from '../router/index';
 
-const baseURL = 'http://localhost:5000/graphql';
+import baseURL from './baseUrl';
+
+const { graphql_api } = baseURL;
 
 const state = {
   isAuth: false,
@@ -33,7 +35,7 @@ const actions = {
       }
     };
 
-    fetch(baseURL,
+    fetch(graphql_api,
       {
         method: 'POST',
         headers: {
@@ -71,7 +73,7 @@ const actions = {
       }
     }
 
-    fetch(baseURL, {
+    fetch(graphql_api, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -90,7 +92,7 @@ const actions = {
         localStorage.setItem('token', resData.data.login.token);
         localStorage.setItem('userId', resData.data.login.userId);
         commit('authState', true);
-
+        router.push('/article')
         // const remainingMilliseconds = 60 * 60 * 1000;
         // const expiryDate = new Date(
         //   new Date().getTime() + remainingMilliseconds

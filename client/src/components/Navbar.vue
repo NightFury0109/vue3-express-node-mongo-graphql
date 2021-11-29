@@ -29,7 +29,7 @@
               <router-link class="nav-link" to="/register">Register</router-link>
             </li>
             <li v-if="isAuth" class="nav-item" id="logout">
-              <div class="nav-link" v-on:click="userLogout">Logout</div>
+              <div class="nav-link" @click="userLogout">Logout</div>
             </li>
           </ul>
         </div>

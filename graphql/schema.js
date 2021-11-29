@@ -6,7 +6,9 @@ module.exports = buildSchema(`
         _id: ID!
         title: String!
         content: String!
+        tags: [String!]
         imageUrl: String!
+        alterText: String!
         creator: User!
         createdAt: String!
         updatedAt: String!
@@ -19,6 +21,7 @@ module.exports = buildSchema(`
         password: String
         status: String!
         role: String!
+        posts: [Post!]!
     }
 
     type AuthData {
@@ -46,6 +49,8 @@ module.exports = buildSchema(`
         title: String!
         content: String!
         imageUrl: String!
+        tags: String!
+        alterText: String!
     }
 
     type RootQuery {

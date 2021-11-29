@@ -22,7 +22,13 @@ const userSchema = new Schema({
   role: {
     type: String,
     default: 'User'
-  }
+  },
+  posts: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Post'
+    }
+  ]
 });
 
 module.exports = mongoose.model('User', userSchema);
