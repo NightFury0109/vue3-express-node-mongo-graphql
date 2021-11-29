@@ -5,13 +5,8 @@ import baseURL from './baseUrl';
 const { graphql_api, upload_api } = baseURL;
 
 const state = {
-  article: {
-    title: '',
-    content: '',
-    tags: '',
-    imageUrl: '',
-    alterText: ''
-  },
+  articles: [],
+  article: {},
   status: false,
   isUpdate: false,
   oldPath: '',
@@ -19,15 +14,16 @@ const state = {
 }
 
 const getters = {
-  article: state => state.article,
+  articles: state => state.articles,
   isUpdate: state => state.isUpdate,
 }
 
 const actions = {
-  addAndUpdateArticle({ commit }, data) {
+  addAndUpdateArticle({ commit, dispatch }, data) {
     commit('setStatus');
 
     const { formData, articleData } = data;
+
     fetch(upload_api, {
       method: 'PUT',
       headers: {
@@ -71,7 +67,7 @@ const actions = {
         if (state.isUpdate) {
           graphqlQuery = {
             query: `
-            mutation UpdateExistingPost($id: ID!, $title: String!, $content: String!, tags: String!, $imageUrl: String!, alterText: String!) {
+            mutation UpdateExistingPost($id: ID!, $title: String!, $content: String!, $tags: String!, $imageUrl: String!, $alterText: String!) {
               updatePost(postId: $id, postInput:{title: $title, content: $content, tags: $tags, imageUrl: $imageUrl, alterText: $alterText}) {
                 _id
                 title
@@ -116,10 +112,104 @@ const actions = {
             throw new Error('Post creation failed');
           }
         }
-        console.log(resData);
+
+        dispatch('getArticles');
       })
       .catch(err => {
         console.log(err);
+      });
+  },
+  getArticles({ commit }) {
+    const page = 1;
+    const graphqlQuery = {
+      query: `
+        query FetchPosts($page: Int) {
+          posts(page: $page) {
+            posts {
+              _id
+              title
+              content
+              tags
+              imageUrl
+              alterText
+              creator {
+                name
+              }
+              createdAt
+            }
+            totalPosts
+          }
+        }
+      `,
+      variables: {
+        page: page
+      }
+    }
+
+    fetch(graphql_api, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.token
+      },
+      body: JSON.stringify(graphqlQuery)
+    })
+      .then(res => {
+        return res.json();
+      })
+      .then(resData => {
+        if (resData.errors) {
+          console.log(resData.errors)
+          throw new Error('Failed to fetch posts.');
+        }
+
+        commit('setArticles', resData.data.posts.posts);
+      })
+      .catch(err => {
+        console.log(err)
+      });
+  },
+  getArticle(context, articleId) {
+    const graphqlQuery = {
+      query: `
+        query FetchSinglePost($postId: ID!) {
+          post(postId: $postId) {
+            _id
+            title
+            content
+            imageUrl
+            creator {
+              name
+            }
+            createdAt
+          }
+        }
+      `,
+      variables: {
+        postId: articleId
+      }
+    }
+
+    fetch(graphql_api, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.token
+      },
+      body: JSON.stringify(graphqlQuery)
+    })
+      .then(res => res.json())
+      .then(resData => {
+        if (resData.errors) {
+          console.log(resData.errors);
+          throw new Error('Failed to load post');
+        }
+
+        context.commit('setArticle', resData.data.post);
+      })
+      .catch(err => {
+        console.log(err);
+        throw new Error('Error');
       });
   }
 };
@@ -128,7 +218,7 @@ const mutations = {
   setStatus(state) {
     state.status = true;
   },
-  setUpdateStatus(state, status) {
+  changeUpdateStatus(state, status) {
     state.isUpdate = status;
   },
   setOldPath(state, path) {
@@ -137,12 +227,11 @@ const mutations = {
   setArticleId(state, id) {
     state.articleID = id;
   },
-  setArticle(state, articleData) {
-    state.title = articleData.title;
-    state.content = articleData.content;
-    state.tags = articleData.tags;
-    state.imageUrl = articleData.imageUrl;
-    state.alterText = articleData.alterText;
+  setArticles(state, articles) {
+    state.articles = articles;
+  },
+  setArticle(state, article) {
+    state.article = article;
   }
 };
 

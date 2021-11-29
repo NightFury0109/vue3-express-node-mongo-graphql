@@ -12,7 +12,7 @@ const postSchema = new Schema({
     required: true
   },
   tags: {
-    type: [String]
+    type: String
   },
   imageUrl: {
     type: String,

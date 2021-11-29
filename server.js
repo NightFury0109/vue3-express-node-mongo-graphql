@@ -23,7 +23,7 @@ const port = PORT || 5000;
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, 'images');
+    callback(null, 'client/public/images');
   },
   filename: (req, file, callback) => {
     crypto.randomBytes(10, (error, buffer) => {
@@ -46,7 +46,7 @@ const fileFilter = (req, file, callback) => {
 };
 
 app.use(bodyParser.json());
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/client/public/images', express.static(path.join(__dirname, 'client/public/images')));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
 
 app.use((req, res, next) => {
@@ -73,7 +73,7 @@ app.put('/post-image', (req, res, next) => {
       .json({ message: 'No image provided' });
   }
   if (req.body.oldPath) {
-    clearImage(req.body.oldPath);
+    clearImage('/client/public/' + req.body.oldPath);
   }
   return res
     .status(201)

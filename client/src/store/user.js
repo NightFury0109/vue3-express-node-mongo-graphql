@@ -1,4 +1,3 @@
-// import { userService } from '../services/userService';
 import router from '../router/index';
 
 import baseURL from './baseUrl';

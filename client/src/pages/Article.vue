@@ -2,7 +2,7 @@
   <div class="d-flex">
     <div class="container-fluid text-start article">
       <div class="row gx-4 d-flex">
-        <div class="col-3">
+        <div class="col-4 px-4">
           <div class="form-group">
             <label for="search" class="mb-2">Search</label>
             <hr class="mt-0 mb-2" />
@@ -17,8 +17,15 @@
             Add Article
           </button>
         </div>
-        <div class="col-9">
-          <p>asdfdsaf</p>
+        <div class="col-8 pe-4 mt-4">
+          <div v-for="(article, key) in articles" :key="key">
+            <ArticleItem
+              v-bind:article="article"
+              :selectArticle="editArticle"
+              :setUpdateStatus="setUpdateStatus"
+              :showArticle="showArticle"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -27,8 +34,11 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
+
 import Modal from "../components/Modal.vue";
+import ArticleItem from "../components/ArticleItem.vue";
+
 export default {
   data() {
     return {
@@ -37,10 +47,15 @@ export default {
   },
   components: {
     Modal,
+    ArticleItem,
   },
-  computed: mapState("article", ["isUpdate", "article", "oldPath"]),
+  mounted() {
+    this.$store.dispatch("article/getArticles");
+  },
+  computed: mapState("article", ["isUpdate", "articles", "oldPath"]),
   methods: {
     ...mapActions("article", ["addAndUpdateArticle"]),
+    ...mapMutations("article", ["setArticle", "changeUpdateStatus","setArticleId","setOldPath"]),
     showModal() {
       this.isModalVisible = true;
     },
@@ -57,9 +72,22 @@ export default {
       }
 
       this.addAndUpdateArticle({
-        formData:formData,
-        articleData:article
+        formData: formData,
+        articleData: article,
       });
+    },
+    editArticle(article) {
+      this.setArticle(article);
+   
+      this.setArticleId(article._id);
+      this.setOldPath(article.imageUrl);
+      this.isModalVisible = true;
+    },
+    showArticle(article) {
+      this.setArticle(article);
+    },
+    setUpdateStatus(status) {
+      this.changeUpdateStatus(status);
     },
   },
 };

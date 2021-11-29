@@ -1,28 +1,45 @@
 <script>
+import { mapState } from "vuex";
 export default {
   name: "Modal",
   data() {
     return {
-      article: {
+      articleData: {
         title: "",
         content: "",
         tags: "",
         alterText: "",
+        imageUrl: "",
       },
       image: null,
       isImageVisible: false,
     };
   },
-  props:{
-    save:{
-      type: Function
+  props: {
+    save: {
+      type: Function,
+    },
+  },
+  computed: mapState("article", ["isUpdate", "article"]),
+  updated() {
+    if (this.isUpdate) {
+      this.articleData.title = this.article.title;
+      this.articleData.content = this.article.content;
+      this.articleData.tags = this.article.tags;
+      this.articleData.imageUrl = this.article.imageUrl;
+      this.articleData.alterText = this.article.alterText;
+      this.isImageVisible = true;
     }
   },
   methods: {
     close() {
       this.$emit("close");
-      this.image=null;
-      this.isImageVisible=false;
+      this.image = null;
+      this.isImageVisible = false;
+      this.articleData.title = "";
+      this.articleData.content = "";
+      this.articleData.tags = "";
+      this.articleData.alterText = "";
     },
     selectFile(e) {
       const file = e.target.files[0];
@@ -36,9 +53,9 @@ export default {
       this.image = file;
       this.isImageVisible = true;
     },
-    saveArticle(){
-      this.save(this.article,this.image);
-    }
+    saveArticle() {
+      this.save(this.articleData, this.image);
+    },
   },
 };
 </script>
@@ -76,7 +93,7 @@ export default {
                       name="title"
                       id="title"
                       class="form-control"
-                      v-model="article.title"
+                      v-model="articleData.title"
                     />
                   </div>
                   <div class="form-group">
@@ -86,7 +103,7 @@ export default {
                       id="content"
                       rows="4"
                       class="form-control"
-                      v-model="article.content"
+                      v-model="articleData.content"
                     />
                   </div>
                   <div class="form-group">
@@ -96,7 +113,7 @@ export default {
                       name="tags"
                       id="tags"
                       class="form-control"
-                      v-model="article.tags"
+                      v-model="articleData.tags"
                     />
                   </div>
                   <p class="info">
@@ -113,7 +130,16 @@ export default {
                       @change="selectFile"
                       v-if="!isImageVisible"
                     />
-                    <img src="" alt="image" class="d-block" v-if="isImageVisible" id="imageView" />
+                    <label class="d-block">
+                      <img
+                        :src="this.articleData.imageUrl"
+                        alt="image"
+                        class="d-block"
+                        v-if="isImageVisible"
+                        id="imageView"
+                      />
+                      <input type="file" style="display: none" @change="selectFile" />
+                    </label>
                   </div>
                   <div class="form-group" v-if="isImageVisible">
                     <label for="alterText">Alternative text</label>
@@ -122,11 +148,12 @@ export default {
                       name="alterText"
                       id="alterText"
                       class="form-control"
-                      v-model="article.alterText"
+                      v-model="articleData.alterText"
                     />
                   </div>
                   <p class="info" v-if="isImageVisible">
-                    Short description of the image used by screen readers and displayed when the image is not loaded. This is important for accessibility.
+                    Short description of the image used by screen readers and displayed
+                    when the image is not loaded. This is important for accessibility.
                   </p>
                   <button type="submit" class="btn btn-success">Save</button>
                   <button type="button" class="btn btn-secondary ms-3" @click="close">
@@ -250,7 +277,7 @@ export default {
   height: 100px;
 }
 
-.info{
+.info {
   font-size: 14px;
   color: grey;
 }

@@ -147,17 +147,11 @@ module.exports = {
 
     checkUser(user);
 
-    let tags;
-
-    if (typeof postInput.tags !== 'undefined') {
-      tags = postInput.tags.split(',');
-    }
-
     const post = new Post({
       title: postInput.title,
       content: postInput.content,
-      tags: tags,
-      imageUrl: postInput.imageUrl,
+      tags: postInput.tags,
+      imageUrl: postInput.imageUrl.slice(14),
       alterText: postInput.alterText,
       creator: user._id
     });
@@ -183,7 +177,7 @@ module.exports = {
     checkAuthentication(req);
 
     page = page || 1;
-    const postPerPage = 2;
+    const postPerPage = 100;
 
     const totalItems = await Post.find()
       .countDocuments();
@@ -256,9 +250,13 @@ module.exports = {
 
     post.title = postInput.title;
     post.content = postInput.content;
+    post.tags = postInput.tags;
+
     if (postInput.imageUrl !== 'undefined') {
-      post.imageUrl = postInput.imageUrl;
+      post.imageUrl = postInput.imageUrl.slice(14);
     }
+
+    post.alterText = postInput.alterText;
 
     const updatedPost = await post.save();
 
