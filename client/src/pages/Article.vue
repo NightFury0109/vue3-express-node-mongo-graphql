@@ -11,6 +11,8 @@
               name="search"
               id="search"
               class="form-control form-control-sm mb-3"
+              v-model="search_key"
+              @input="search"
             />
           </div>
           <button type="button" class="btn btn-primary" @click="showModal">
@@ -42,7 +44,7 @@ import ArticleItem from "../components/ArticleItem.vue";
 export default {
   data() {
     return {
-      isModalVisible: false,
+      search_key: "",
     };
   },
   components: {
@@ -52,42 +54,77 @@ export default {
   mounted() {
     this.$store.dispatch("article/getArticles");
   },
-  computed: mapState("article", ["isUpdate", "articles", "oldPath"]),
+  computed: mapState("article", [
+    "isUpdate",
+    "articles",
+    "articles2",
+    "oldPath",
+    "isModalVisible",
+  ]),
   methods: {
-    ...mapActions("article", ["addAndUpdateArticle"]),
-    ...mapMutations("article", ["setArticle", "changeUpdateStatus","setArticleId","setOldPath"]),
+    ...mapActions("article", ["addAndUpdateArticle","getArticles"]),
+    ...mapMutations("article", [
+      "setArticle",
+      "changeUpdateStatus",
+      "setArticleId",
+      "setOldPath",
+      "setImageVisible",
+      "setError",
+      "setModalVisible",
+      "setArticles"
+    ]),
     showModal() {
-      this.isModalVisible = true;
+      this.setModalVisible(true);
     },
     closeModal() {
-      this.isModalVisible = false;
+      this.setModalVisible(false);
+      this.setImageVisible(false);
+      this.setArticle({});
+      this.setError("");
     },
     saveArticle(article, image) {
-      const formData = new FormData();
+      if (!image && !this.isUpdate) {
+        this.setError("Select image");
+      } else {
+        const formData = new FormData();
 
-      formData.append("image", image);
+        formData.append("image", image);
 
-      if (this.isUpdate) {
-        formData.append("oldPath", this.oldPath);
+        if (this.isUpdate) {
+          formData.append("oldPath", this.oldPath);
+        }
+
+        this.addAndUpdateArticle({
+          formData: formData,
+          articleData: article,
+        });
       }
-
-      this.addAndUpdateArticle({
-        formData: formData,
-        articleData: article,
-      });
     },
     editArticle(article) {
       this.setArticle(article);
-   
+
       this.setArticleId(article._id);
       this.setOldPath(article.imageUrl);
-      this.isModalVisible = true;
+      this.setImageVisible(true);
+      this.setModalVisible(true);
     },
     showArticle(article) {
       this.setArticle(article);
     },
     setUpdateStatus(status) {
       this.changeUpdateStatus(status);
+    },
+    search() {
+      console.log('search')
+      if (this.search_key) {
+        const search_result = this.articles2.filter((article) => {
+          return article.title.toLowerCase().search(this.search_key) !== -1;
+        });
+
+        this.setArticles(search_result);
+      } else {
+        this.getArticles();
+      }
     },
   },
 };

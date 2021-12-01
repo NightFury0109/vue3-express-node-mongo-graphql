@@ -11,8 +11,7 @@ export default {
         alterText: "",
         imageUrl: "",
       },
-      image: null,
-      isImageVisible: false,
+      image: this.imageFile,
     };
   },
   props: {
@@ -20,26 +19,22 @@ export default {
       type: Function,
     },
   },
-  computed: mapState("article", ["isUpdate", "article"]),
+  computed: mapState("article", ["isUpdate", "article","isImageVisible","error","imageFile"]),
   updated() {
-    if (this.isUpdate) {
       this.articleData.title = this.article.title;
       this.articleData.content = this.article.content;
       this.articleData.tags = this.article.tags;
       this.articleData.imageUrl = this.article.imageUrl;
       this.articleData.alterText = this.article.alterText;
-      this.isImageVisible = true;
-    }
   },
   methods: {
     close() {
-      this.$emit("close");
       this.image = null;
-      this.isImageVisible = false;
       this.articleData.title = "";
       this.articleData.content = "";
       this.articleData.tags = "";
       this.articleData.alterText = "";
+      this.$emit("close");
     },
     selectFile(e) {
       const file = e.target.files[0];
@@ -51,7 +46,7 @@ export default {
 
       reader.readAsDataURL(file);
       this.image = file;
-      this.isImageVisible = true;
+      this.$store.commit("article/setImageVisible",true);
     },
     saveArticle() {
       this.save(this.articleData, this.image);
@@ -85,6 +80,7 @@ export default {
 
             <section class="modal-body" id="modalDescription">
               <slot name="body">
+                <div class="text-start text-danger my-2" v-if="error">{{ error }}</div>
                 <form class="text-start" @submit.prevent="saveArticle" novalidate>
                   <div class="form-group">
                     <label for="title">Title</label>

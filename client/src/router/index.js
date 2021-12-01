@@ -4,6 +4,7 @@ import Login from "../pages/Login.vue";
 import Register from '../pages/Register.vue';
 import Article from '../pages/Article.vue';
 import ArticleView from '../pages/ArticleView.vue';
+import ResetPassword from '../pages/ResetPassword.vue';
 
 const routes = [
   {
@@ -25,6 +26,10 @@ const routes = [
   {
     path: '/article/:articleId',
     component: ArticleView
+  },
+  {
+    path: '/resetPassword/:userId/:token',
+    component: ResetPassword
   }
 ];
 

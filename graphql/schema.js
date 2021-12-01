@@ -29,6 +29,10 @@ module.exports = buildSchema(`
         userId: String!
     }
 
+    type Msg {
+        msg: String!
+    }
+
     type PostData {
         posts: [Post!]!
         totalPosts: Int!
@@ -45,6 +49,13 @@ module.exports = buildSchema(`
         password: String!
     }
 
+    input ResetPwInputData {
+        userId: String!
+        token: String!
+        password: String!
+        password2: String!
+    }
+
     input PostInputData {
         title: String!
         content: String!
@@ -58,6 +69,7 @@ module.exports = buildSchema(`
         posts(page: Int): PostData!
         post(postId: ID!): Post!
         user: User!
+        sendMail(email: String!): Msg!
     }
 
     type RootMutation {
@@ -65,6 +77,7 @@ module.exports = buildSchema(`
         createPost(postInput: PostInputData): Post!
         updatePost(postId: ID!, postInput: PostInputData!): Post!
         deletePost(postId: ID!): Boolean
+        resetPassword(data: ResetPwInputData): Boolean
     }
 
     schema {

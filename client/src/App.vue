@@ -1,6 +1,7 @@
 <template>
   <Navbar />
   <router-view />
+  <notifications />
 </template>
 
 <script>

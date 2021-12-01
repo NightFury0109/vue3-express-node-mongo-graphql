@@ -1,4 +1,5 @@
 // import router from '../router/index';
+import { notify } from "@kyvg/vue3-notification";
 
 import baseURL from './baseUrl';
 
@@ -6,16 +7,22 @@ const { graphql_api, upload_api } = baseURL;
 
 const state = {
   articles: [],
+  articles2: [],
   article: {},
   status: false,
   isUpdate: false,
   oldPath: '',
-  articleID: null
+  articleID: null,
+  isImageVisible: false,
+  isModalVisible: false,
+  imageFile: null,
+  error: ''
 }
 
 const getters = {
   articles: state => state.articles,
   isUpdate: state => state.isUpdate,
+  article: state => state.article,
 }
 
 const actions = {
@@ -105,7 +112,12 @@ const actions = {
       .then(res => res.json())
       .then(resData => {
         if (resData.errors) {
-          console.log(resData.errors);
+          console.log(resData);
+          if (resData.errors[0].data) {
+            commit('setError', resData.errors[0].data[0]);
+          } else {
+            commit('setError', resData.errors[0].message);
+          }
           if (this.state.editPost) {
             throw new Error('Could not edit post');
           } else {
@@ -113,6 +125,17 @@ const actions = {
           }
         }
 
+        notify({
+          text: "Article successfully saved",
+          duration: 5000,
+          type: 'success'
+        });
+        commit('setError', '');
+        commit('setArticle', {});
+        commit('setModalVisible', false);
+        commit('setImageVisible', false);
+        commit('changeUpdateStatus', false);
+        commit('setImage', null);
         dispatch('getArticles');
       })
       .catch(err => {
@@ -164,12 +187,13 @@ const actions = {
         }
 
         commit('setArticles', resData.data.posts.posts);
+        commit('setArticles2', resData.data.posts.posts);
       })
       .catch(err => {
         console.log(err)
       });
   },
-  getArticle(context, articleId) {
+  getArticle({ commit }, articleId) {
     const graphqlQuery = {
       query: `
         query FetchSinglePost($postId: ID!) {
@@ -204,8 +228,8 @@ const actions = {
           console.log(resData.errors);
           throw new Error('Failed to load post');
         }
-
-        context.commit('setArticle', resData.data.post);
+        // console.log(resData.data.post)
+        commit('setArticle', resData.data.post);
       })
       .catch(err => {
         console.log(err);
@@ -230,8 +254,23 @@ const mutations = {
   setArticles(state, articles) {
     state.articles = articles;
   },
+  setArticles2(state, articles) {
+    state.articles2 = articles;
+  },
   setArticle(state, article) {
     state.article = article;
+  },
+  setImageVisible(state, status) {
+    state.isImageVisible = status;
+  },
+  setModalVisible(state, status) {
+    state.isModalVisible = status;
+  },
+  setError(state, err) {
+    state.error = err;
+  },
+  setImage(state, image) {
+    state.imageFile = image;
   }
 };
 

@@ -31,3 +31,11 @@ body {
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(167, 165, 165);
   }
+
+  .vue-notification {
+    top: 65px;
+    position: fixed;
+    right: 5px;
+    border-radius: 10px;
+    font-size: 16px;
+  }

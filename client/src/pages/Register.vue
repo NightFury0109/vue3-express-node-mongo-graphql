@@ -1,15 +1,16 @@
 <template>
   <div class="d-flex justify-content-center align-content-center">
     <main class="box">
-      <h2>Register</h2>
+      <h2 class="mb-2">Register</h2>
+      <div class="text-start text-danger my-2" v-if="error">{{ error }}</div>
       <form @submit.prevent="handleSubmit" novalidate>
         <div class="inputBox">
-          <label for="username">User's name</label>
+          <label for="username">Username</label>
           <input
             type="text"
             name="username"
             id="username"
-            placeholder="type your username"
+            placeholder="Type your username"
             v-model="userData.name"
           />
         </div>
@@ -19,7 +20,7 @@
             type="text"
             name="email"
             id="email"
-            placeholder="type your email"
+            placeholder="Type your email"
             v-model="userData.email"
           />
         </div>
@@ -29,7 +30,7 @@
             type="password"
             name="userPassword"
             id="userPassword"
-            placeholder="type your password"
+            placeholder="Type your password"
             v-model="userData.password"
           />
         </div>
@@ -39,7 +40,7 @@
             type="password"
             name="userPassword"
             id="userConfirmPassword"
-            placeholder="confirm your password"
+            placeholder="Confirm your password"
             v-model="userData.password2"
           />
         </div>
@@ -47,12 +48,11 @@
         <router-link class="button" style="float: left" to="/login">Login</router-link>
       </form>
     </main>
-    <footer></footer>
   </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   name: "Register",
@@ -66,14 +66,17 @@ export default {
       },
     };
   },
-  
+  computed: mapState("user", ["error"]),
+  beforeUnmount() {
+    this.$store.commit("user/setError", "");
+  },
   methods: {
     ...mapActions("user", ["register"]),
     handleSubmit() {
-      if(this.userData.password===this.userData.password2){
+      if (this.userData.password === this.userData.password2) {
         this.register(this.userData);
-      }else{
-        console.log('dismatch')
+      } else {
+        this.$store.commit("user/setError", "Password must match");
       }
     },
   },
@@ -92,7 +95,7 @@ export default {
   left: 50%; */
   /* transform: translate(-50%, -50%); */
   text-align: left;
-  width: 60vw;
+  width: 50vw;
   min-width: 350px;
 }
 

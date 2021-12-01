@@ -4,12 +4,17 @@ const fs = require('fs');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const User = require('../models/user');
 const Post = require('../models/post');
+const Token = require('../models/token');
 // const { clearImage } = require('../utils/file');
-const { JWT_KEY } = process.env;
+const sendMail = require('../utils/sendMail');
+
+const isEmpty = require('../utils/is-empty');
+const { JWT_KEY, CLIENT_URL } = process.env;
 
 const checkAuthentication = (req) => {
   if (!req.isAuth) {
@@ -136,6 +141,9 @@ module.exports = {
     if (validator.isEmpty(postInput.imageUrl)) {
       errors.push('Image is required');
     }
+    if (validator.isEmpty(postInput.alterText) || !validator.isLength(postInput.alterText, { min: 5 })) {
+      errors.push('Alternative text should be atleast 5 characters long');
+    }
     if (errors.length > 0) {
       const error = new Error('Validation failed');
       error.data = errors;
@@ -181,7 +189,7 @@ module.exports = {
 
     const totalItems = await Post.find()
       .countDocuments();
-    const posts = await Post.find()
+    const posts = await Post.find({ creator: req.userId })
       .populate('creator')
       .sort({ createdAt: -1 })
       .skip((page - 1) * postPerPage)
@@ -240,6 +248,9 @@ module.exports = {
     }
     if (validator.isEmpty(postInput.content) || !validator.isLength(postInput.content, { min: 5 })) {
       errors.push('Content should be atleast 5 characters long');
+    }
+    if (validator.isEmpty(postInput.alterText) || !validator.isLength(postInput.alterText, { min: 5 })) {
+      errors.push('Alternative text should be atleast 5 characters long');
     }
     if (errors.length > 0) {
       const error = new Error('Validation failed');
@@ -325,5 +336,95 @@ module.exports = {
       ...updatedUser._doc,
       _id: updatedUser._doc._id.toString()
     };
+  },
+  sendMail: async ({ email }, req) => {
+    const errors = [];
+    if (!validator.isEmail(email)) {
+      errors.push('Invalid email');
+    }
+
+    if (errors.length > 0) {
+      const error = new Error('Validation failed');
+      error.data = errors;
+      error.statusCode = 422;
+      throw error;
+    }
+
+    const user = await User.findOne({ email: email });
+
+    if (isEmpty(user)) {
+      const error = new Error('Email not registered!');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    let token = await Token.findOne({ userId: user._id });
+
+    if (!isEmpty(token)) await token.remove();
+
+    let resetToken = crypto.randomBytes(32).toString("hex");
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(resetToken, salt);
+
+    const newToken = new Token({
+      userId: user._id,
+      token: hash
+    });
+
+    await newToken.save();
+
+    const link = `${CLIENT_URL}/resetPassword/${user._id}/${resetToken}`;
+
+    const result = await sendMail(user.email, "Password Reset Request", { link: link });
+
+    console.log(result);
+
+    return { msg: 'success' };
+  },
+  resetPassword: async ({ data }, req) => {
+    const errors = [];
+
+    if (validator.isEmpty(data.password) || !validator.isLength(data.password, { min: 6 })) {
+      errors.push('Password should be atleast 6 characters long');
+    } else if (!validator.equals(data.password, data.password2)) {
+      errors.push('Password must match');
+    }
+
+    if (errors.length > 0) {
+      const error = new Error('Validation failed');
+      error.data = errors;
+      error.statusCode = 422;
+      throw error;
+    }
+
+    const resetPwToken = await Token.findOne({ userId: data.userId });
+
+    if (isEmpty(resetPwToken)) {
+      const error = new Error('Invalid or expired password reset token');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const isValid = await bcrypt.compare(data.token, resetPwToken.token);
+
+    if (!isValid) {
+      const error = new Error('Invalid or expired password reset token');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+
+    const newPw = await bcrypt.hash(req.body.password, salt);
+
+    const user = await User.findOne({ id: data.userId });
+
+    user.password = newPw;
+
+    await user.save();
+
+    await resetPwToken.remove();
+
+    return true;
   }
 };

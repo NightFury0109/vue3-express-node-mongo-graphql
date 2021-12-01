@@ -1,12 +1,5 @@
 <script>
-import jwt_decode from 'jwt-decode';
-
 export default {
-  data() {
-    return {
-      user:{}
-    }
-  },
   props: {
     article: {
       type: Object,
@@ -20,9 +13,6 @@ export default {
     showArticle:{
       type:Function
     }
-  },
-  mounted() {
-    this.user=jwt_decode(localStorage.token);
   },
   methods: {
     select(){
@@ -53,7 +43,7 @@ export default {
       <router-link :to="'/article/' + article._id">
         <button type="button" class="btn btn-success btn-sm" @click="show">View</button>
       </router-link>
-      <button type="button" class="btn btn-secondary btn-sm" @click="select" v-if="this.user.name===article.creator.name">Edit</button>
+      <button type="button" class="btn btn-secondary btn-sm" @click="select">Edit</button>
       <!-- <button type="button" class="btn btn-danger btn-sm">Delete</button> -->
     </div>
   </div>

@@ -1,34 +1,33 @@
 <template>
   <div class="d-flex justify-content-center">
     <main class="box">
-      <h2 class="mb-2">Login</h2>
+      <h2 class="mb-2">Reset Password</h2>
       <div class="text-start text-danger my-2" v-if="error">{{ error }}</div>
-      <form @submit.prevent="userLogin" novalidate>
+      <form @submit.prevent="resetPw" novalidate>
         <div class="inputBox">
-          <label for="email">Email</label>
-          <input
-            type="text"
-            name="email"
-            id="email"
-            placeholder="Type your email"
-            v-model="userData.email"
-          />
-        </div>
-        <div class="inputBox">
-          <label for="userPassword">Password</label>
+          <label for="password">Password</label>
           <input
             type="password"
-            name="userPassword"
-            id="userPassword"
+            name="password"
+            id="password"
             placeholder="Type your password"
-            v-model="userData.password"
+            v-model="pwData.password"
           />
         </div>
-        <p class="text-end forgot-password" @click="sendRequest">Forgot Password?</p>
+        <div class="inputBox">
+          <label for="password2">Confirm Password</label>
+          <input
+            type="password"
+            name="password2"
+            id="password2"
+            placeholder="Confirm your password"
+            v-model="pwData.password2"
+          />
+        </div>
         <div>
-          <button type="submit" name="" style="float: left">Login</button>
-          <router-link class="button" style="float: left" to="/register"
-            >Register</router-link
+          <button type="submit" name="" style="float: left">Reset Password</button>
+          <router-link class="button" style="float: left" to="/login"
+            >Login</router-link
           >
         </div>
       </form>
@@ -37,38 +36,33 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapMutations } from "vuex";
-import validator from "validator";
+import {mapActions,mapState} from 'vuex';
 export default {
-  name: "Login",
-  data() {
-    return {
-      userData: {
-        email: "",
-        password: "",
-      },
-    };
+  data(){
+    return{
+      pwData:{
+        password:'',
+        password2:''
+      }
+    }
   },
-  computed: mapState("user", ["error"]),
+  computed: mapState('user',['error']),
   beforeUnmount() {
     this.$store.commit('user/setError','');
   },
   methods: {
-    ...mapActions("user", ["login", "sendResetPwRequest"]),
-    ...mapMutations("user", ["setError"]),
-    userLogin() {
-      this.login(this.userData);
-    },
-    sendRequest() {
-      if (!this.userData.email) {
-        this.setError("Input email");
-      } else if (!validator.isEmail(this.userData.email)) {
-        this.setError("Invalid email");
-      } else {
-        this.sendResetPwRequest(this.userData.email);
-      }
-    },
-  },
+    ...mapActions('user',['resetPassword']),
+    resetPw(){
+      const data={
+        userId: this.$route.params.userId,
+        token: this.$route.params.token,
+        password: this.pwData.password,
+        password2: this.pwData.password2
+      };
+
+      this.resetPassword(data);
+    }
+  }
 };
 </script>
 
@@ -138,11 +132,11 @@ a.button:hover {
   opacity: 0.8;
 }
 
-.forgot-password {
+.forgot-password{
   color: white;
 }
-.forgot-password:hover {
-  color: lightgray;
+.forgot-password:hover{
+  color:lightgray;
   cursor: pointer;
   text-decoration: underline white;
 }
