@@ -5,6 +5,7 @@ import Register from '../pages/Register.vue';
 import Article from '../pages/Article.vue';
 import ArticleView from '../pages/ArticleView.vue';
 import ResetPassword from '../pages/ResetPassword.vue';
+import SendRequest from '../pages/SendRequest.vue';
 
 const routes = [
   {
@@ -30,6 +31,10 @@ const routes = [
   {
     path: '/resetPassword/:userId/:token',
     component: ResetPassword
+  },
+  {
+    path: '/sendRequest',
+    component: SendRequest
   }
 ];
 

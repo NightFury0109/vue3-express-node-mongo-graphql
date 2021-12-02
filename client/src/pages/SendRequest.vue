@@ -1,9 +1,9 @@
 <template>
   <div class="d-flex justify-content-center">
     <main class="box">
-      <h2 class="mb-2">Login</h2>
+      <h2 class="mb-2">Send Request</h2>
       <div class="text-start text-danger my-2" v-if="error">{{ error }}</div>
-      <form @submit.prevent="userLogin" novalidate>
+      <form @submit.prevent="sendRequest" novalidate>
         <div class="inputBox">
           <label for="email">Email</label>
           <input
@@ -11,24 +11,13 @@
             name="email"
             id="email"
             placeholder="Type your email"
-            v-model="userData.email"
+            v-model="email"
           />
         </div>
-        <div class="inputBox">
-          <label for="userPassword">Password</label>
-          <input
-            type="password"
-            name="userPassword"
-            id="userPassword"
-            placeholder="Type your password"
-            v-model="userData.password"
-          />
-        </div>
-        <router-link class="forgot-password" to="/sendRequest"><p class="text-end  my-2">Forgot Password?</p></router-link>
         <div>
-          <button type="submit" name="" style="float: left">Login</button>
-          <router-link class="button" style="float: left" to="/register"
-            >Register</router-link
+          <button type="submit" name="" style="float: left">Send</button>
+          <router-link class="button" style="float: left" to="/login"
+            >Login</router-link
           >
         </div>
       </form>
@@ -38,15 +27,12 @@
 
 <script>
 import { mapActions, mapState, mapMutations } from "vuex";
-
+import validator from "validator";
 export default {
   name: "Login",
   data() {
     return {
-      userData: {
-        email: "",
-        password: "",
-      },
+      email:''
     };
   },
   computed: mapState("user", ["error"]),
@@ -54,10 +40,16 @@ export default {
     this.$store.commit('user/setError','');
   },
   methods: {
-    ...mapActions("user", ["login"]),
+    ...mapActions("user", ["sendResetPwRequest"]),
     ...mapMutations("user", ["setError"]),
-    userLogin() {
-      this.login(this.userData);
+    sendRequest() {
+      if (!this.email) {
+        this.setError("Input email");
+      } else if (!validator.isEmail(this.email)) {
+        this.setError("Invalid email");
+      } else {
+        this.sendResetPwRequest(this.email);
+      }
     },
   },
 };
